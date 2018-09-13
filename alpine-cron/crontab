@@ -1,0 +1,2 @@
+# min	hour	day	month	weekday	command
+*	*	*	*	*	touch /var/log/job_done.log

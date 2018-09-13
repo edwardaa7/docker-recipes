@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  nginx:
+    restart: always
+    container_name: nginx
+    image: nginx:alpine
+
+    networks:
+      net:
+        ipv4_address: 172.10.0.2
+
+    ports:
+      - 80:80
+
+    volumes:
+      - ./nginx_django.conf:/etc/nginx/conf.d/default.conf:ro
+      - static:/mnt/collectstatic
+
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: webapp
+
+    depends_on:
+      - nginx
+
+    networks:
+      net:
+        ipv4_address: 172.10.0.3
+
+    volumes:
+      - static:/app/collectstatic
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.10.0.0/24
+
+volumes:
+  upload:
+  static:

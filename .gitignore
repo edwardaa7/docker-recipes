@@ -1,0 +1,7 @@
+*.pyc
+.DS_Store
+env/
+project/collectstatic/
+tmp/
+.idea/
+
