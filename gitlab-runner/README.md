@@ -9,3 +9,7 @@ sudo docker-compose up -d
 
 3. Register gitlab-runner for your project
 sudo docker exec -it gitlab-runner gitlab-runner register
+
+4. Restart docker-compose script
+sudo docker-compose down
+sudo docker-compose up -d
