@@ -1,3 +1,5 @@
+# django-production
+
 This is a Django 1.11 deploy configuration for a simplistic production deployment consisting of:
 1. A sample Django web app
 2. UWSGI server
