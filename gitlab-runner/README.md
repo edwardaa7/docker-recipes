@@ -11,11 +11,10 @@ curl -sSL https://get.docker.com/ | sh
 ```
 
 
-2. Start the docker-compose script
+2. Copy the docker-compose.yml script to a folder, then start the docker-compose script from that folder
 ```
 sudo docker-compose up -d
 ```
-
 
 3. Register gitlab-runner for your project
 ```
