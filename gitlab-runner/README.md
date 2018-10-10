@@ -1,3 +1,7 @@
+# gitlab-runner: docker-compose script
+
+To startup / shutdown the gitlab-runner Docker image.
+
 Inspired by https://docs.gitlab.com/runner/install/docker.html
 
 To use:
