@@ -1,0 +1,35 @@
+#! /bin/sh
+
+function link_ssl_cert() {
+    rm /etc/nginx/server.crt
+    rm /etc/nginx/server.key
+    ln -s /etc/lego/certificates/${SSL_DOMAIN}.crt /etc/nginx/server.crt
+    ln -s /etc/lego/certificates/${SSL_DOMAIN}.key /etc/nginx/server.key
+}
+
+function generate_default_cert() {
+    cd /etc/nginx
+    openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt -subj '/CN=localhost'
+}
+
+# SSL_DOMAIN and SSL_ADMIN_EMAIL environment variables must be present,
+# otherwise we will not use letsencrypt
+if [[ ! -z $SSL_DOMAIN ]] || [[ ! -z $SSL_ADMIN_EMAIL ]]; then
+    # if this is the first time running, we'll need to initialise the SSL cert
+    if [[ ! -f /etc/lego/certificates/${SSL_DOMAIN}.crt ]]; then
+        echo "Initialising SSL cert for ${SSL_DOMAIN}" > /dev/stdout
+        yes | /usr/local/bin/lego --tls --email="${SSL_ADMIN_EMAIL}" \
+            --domains="${SSL_DOMAIN}" --path="/etc/lego" run
+        link_ssl_cert
+
+    # otherwise, renew the SSL Cert
+    else
+        echo "Renewing SSL cert for ${SSL_DOMAIN}" > /dev/stdout
+        /usr/local/bin/lego --tls --email="${SSL_ADMIN_EMAIL}" --domains="${SSL_DOMAIN}" --path="/etc/lego" renew
+        touch /tmp/lego-last-renewed
+        link_ssl_cert
+    fi
+else
+    # if no domain is defined, we will generate a self-signed certificate
+    generate_default_cert
+fi
