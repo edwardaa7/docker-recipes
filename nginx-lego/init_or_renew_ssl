@@ -17,17 +17,35 @@ function generate_default_cert() {
 if [[ ! -z $SSL_DOMAIN ]] || [[ ! -z $SSL_ADMIN_EMAIL ]]; then
     # if this is the first time running, we'll need to initialise the SSL cert
     if [[ ! -f /etc/lego/certificates/${SSL_DOMAIN}.crt ]]; then
-        echo "Initialising SSL cert for ${SSL_DOMAIN}" > /dev/stdout
-        yes | /usr/local/bin/lego --tls --email="${SSL_ADMIN_EMAIL}" \
-            --domains="${SSL_DOMAIN}" --path="/etc/lego" run
-        link_ssl_cert
+        # HACK: to handle 2nd subdomain, we'll check if $SSL_DOMAIN2 is present
+        # and add it in here
+        if [[ ! -z $SSL_DOMAIN2 ]]; then
+            echo "Initialising SSL cert for ${SSL_DOMAIN}, ${SSL_DOMAIN2}" > /dev/stdout
+            yes | /usr/local/bin/lego --tls --email="${SSL_ADMIN_EMAIL}" \
+                --domains="${SSL_DOMAIN}" --domains="${SSL_DOMAIN2}" --path="/etc/lego" run
+            link_ssl_cert
+        else
+            echo "Initialising SSL cert for ${SSL_DOMAIN}" > /dev/stdout
+            yes | /usr/local/bin/lego --tls --email="${SSL_ADMIN_EMAIL}" \
+                --domains="${SSL_DOMAIN}" --path="/etc/lego" run
+            link_ssl_cert
+        fi
 
     # otherwise, renew the SSL Cert
     else
-        echo "Renewing SSL cert for ${SSL_DOMAIN}" > /dev/stdout
-        /usr/local/bin/lego --tls --email="${SSL_ADMIN_EMAIL}" --domains="${SSL_DOMAIN}" --path="/etc/lego" renew
-        touch /tmp/lego-last-renewed
-        link_ssl_cert
+        # HACK: to handle 2nd subdomain, we'll check if $SSL_DOMAIN2 is present
+        # and add it in here
+        if [[ ! -z $SSL_DOMAIN2 ]]; then
+            echo "Renewing SSL cert for ${SSL_DOMAIN}, ${SSL_DOMAIN2}" > /dev/stdout
+            /usr/local/bin/lego --tls --email="${SSL_ADMIN_EMAIL}" --domains="${SSL_DOMAIN}" --domains="${SSL_DOMAIN2}" --path="/etc/lego" renew
+            touch /tmp/lego-last-renewed
+            link_ssl_cert
+        else
+            echo "Renewing SSL cert for ${SSL_DOMAIN}" > /dev/stdout
+            /usr/local/bin/lego --tls --email="${SSL_ADMIN_EMAIL}" --domains="${SSL_DOMAIN}" --path="/etc/lego" renew
+            touch /tmp/lego-last-renewed
+            link_ssl_cert
+        fi
     fi
 else
     # if no domain is defined, we will generate a self-signed certificate

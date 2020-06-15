@@ -30,3 +30,15 @@ The Dockerfile uses **nginx:alpine** as its base docker image and adds in the fo
 <br/>
 
 An example docker-compose.yml script is provided in this repository to demonstrate its usage.
+
+<br/>
+
+### Hack
+Currently there's a hack included to allow for creating/rewewing a subdomain, so if we need to create an SSL cert for example.com and www.example.com, just provide the respective environment variables SSL_DOMAIN and SSL_DOMAIN2 to the docker image.
+
+eg.
+```bash
+docker run --rm -it -e SSL_DOMAIN=example.com -e SSL_DOMAIN2=www.example.com -e SSL_ADMIN_EMAIL=admin@example.com nginx-lego:alpine
+```
+
+Future releases of this Docker image will include a cleaner way to deal with multiple domains.
